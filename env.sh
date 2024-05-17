@@ -15,8 +15,9 @@ if [ ! -d ${VENV_ROOT} ]; then
 	python3 -m venv ${VENV_ROOT}
 	cd ${TT_TOOL_ROOT}/ && git apply ../patches/tt-support-tools/*
 	cd -
-	pip -r install ${TT_TOOL_ROOT}/requirements.txt
-	pip -r install ${PROJ_ROOT}/test/requirements.txt
+	${VENV_ROOT}/bin/pip install -r ${TT_ROOT}/requirements.txt
+	${VENV_ROOT}/bin/pip install -r ${TT_TOOL_ROOT}/requirements.txt
+	${VENV_ROOT}/bin/pip install -r ${PROJ_ROOT}/test/requirements.txt
 fi
 
 source ${VENV_ROOT}/bin/activate

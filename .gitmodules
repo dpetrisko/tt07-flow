@@ -18,8 +18,10 @@
     path = tt-support-tools
     url = https://github.com/TinyTapeout/tt-support-tools.git
     ignore = dirty
+    branch = tt07
 [submodule "tt07-dll"]
     path = tt07-dll
     url = https://github.com/dpetrisko/tt07-dll.git
     ignore = dirty
+    branch = master
 

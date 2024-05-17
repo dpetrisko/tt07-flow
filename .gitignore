@@ -1,0 +1,10 @@
+.venv
+output.elab.v
+output.map.v
+output.opt.v
+output.sv2v.v
+output.syn.v
+output.json
+slpp_all
+check.rpt
+stat.rpt

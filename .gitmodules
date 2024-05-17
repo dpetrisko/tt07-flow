@@ -1,0 +1,25 @@
+[submodule "iverilog"]
+    path = iverilog
+    url = https://github.com/steveicarus/iverilog.git
+    ignore = dirty
+[submodule "verilator"]
+    path = verilator
+    url = https://github.com/verilator/verilator.git
+    ignore = dirty
+[submodule "OpenLane"]
+    path = OpenLane
+    url = https://github.com/The-OpenROAD-Project/OpenLane.git
+    ignore = dirty
+[submodule "synlig"]
+    path = synlig
+    url = https://github.com/chipsalliance/synlig.git
+    ignore = dirty
+[submodule "tt-support-tools"]
+    path = tt-support-tools
+    url = https://github.com/TinyTapeout/tt-support-tools.git
+    ignore = dirty
+[submodule "tt07-dll"]
+    path = tt07-dll
+    url = https://github.com/dpetrisko/tt07-dll.git
+    ignore = dirty
+

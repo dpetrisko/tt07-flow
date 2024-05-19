@@ -1,12 +1,12 @@
-From 1dde6b3c32177ef487f019e579744339eb3e2115 Mon Sep 17 00:00:00 2001
+From 9f021e2405bd5a69c46007232f4efdf43123427f Mon Sep 17 00:00:00 2001
 From: Dan Petrisko <petrisko@cs.washington.edu>
-Date: Fri, 17 May 2024 12:15:22 -0500
-Subject: [PATCH] Using yosys.tcl
+Date: Sun, 19 May 2024 14:38:22 -0700
+Subject: [PATCH] Tweaking prereqs
 
 ---
  project.py       | 23 +++++++++++------------
- requirements.txt |  2 +-
- 2 files changed, 12 insertions(+), 13 deletions(-)
+ requirements.txt |  6 +++---
+ 2 files changed, 14 insertions(+), 15 deletions(-)
 
 diff --git a/project.py b/project.py
 index 1441bda..0c898d7 100644
@@ -53,7 +53,7 @@ index 1441bda..0c898d7 100644
              ports = json.load(fh)
          os.unlink(json_file)
 diff --git a/requirements.txt b/requirements.txt
-index 4a13b99..5394012 100644
+index 4a13b99..56faa1f 100644
 --- a/requirements.txt
 +++ b/requirements.txt
 @@ -8,7 +8,7 @@ chevron==0.14.0
@@ -65,6 +65,16 @@ index 4a13b99..5394012 100644
  gitdb==4.0.10
  GitPython==3.1.40
  idna==3.4
+@@ -28,7 +28,7 @@ tinycss2==1.2.1
+ urllib3==2.0.3
+ wasmtime==9.0.0
+ webencodings==0.5.1
+-yowasp-runtime==1.22
+-yowasp-yosys==0.30.0.0.post538
++#yowasp-runtime==1.22
++#yowasp-yosys==0.30.0.0.post538
+ zipp==3.15.0
+ pre-commit==3.4.0
 -- 
-2.34.1
+2.16.5
 

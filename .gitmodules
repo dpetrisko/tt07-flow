@@ -24,4 +24,9 @@
     url = https://github.com/dpetrisko/tt07-dll.git
     ignore = dirty
     branch = master
+[submodule "bsg_cadenv"]
+    path = bsg_cadenv
+    url = git@github.com:bespoke-silicon-group/bsg_cadenv.git
+    update = none
+    branch = master
 

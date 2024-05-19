@@ -1,0 +1,48 @@
+TOP := $(shell git rev-parse --show-toplevel)
+
+# Set directory structure
+export TT_ROOT              ?= $(TOP)
+export PDK_ROOT             ?= $(TT_ROOT)/.volare
+export PDK                  ?= sky130A
+export PDK_TYPE             ?= sky130_fd_sc_hd
+export PROJ_ROOT            ?= $(TT_ROOT)/tt07-dll
+export PATH                 ?= $(TT_ROOT)/synlig/out/current/bin:$(PATH)
+export BASEJUMP_STL_DIR     ?= $(PROJ_ROOT)/src/basejump_stl
+export OPENLANE_ROOT        ?= $(TT_ROOT)/OpenLane
+export VERILATOR_ROOT       ?= $(TT_ROOT)/verilator
+export IVERILOG_ROOT        ?= $(TT_ROOT)/iverilog
+export SYNLIG_ROOT          ?= $(TT_ROOT)/synlig
+export PATCH_ROOT           ?= $(TT_ROOT)/patches
+export TT_TOOL_ROOT         ?= $(TT_ROOT)/tt-support-tools
+export TT_INSTALL_DIR       ?= $(TT_ROOT)/install
+export TT_INSTALL_BIN_DIR   ?= $(TT_INSTALL_DIR)/bin
+export TT_INSTALL_LIB_DIR   ?= $(TT_INSTALL_DIR)/lib
+export TT_INSTALL_WORK_DIR  ?= $(TT_INSTALL_DIR)/work
+export TT_INSTALL_TOUCH_DIR ?= $(TT_INSTALL_DIR)/touchfiles
+export VENV_ROOT            ?= $(TT_ROOT)/.venv
+
+## Set variables needed for building tools
+export GCC       ?= gcc
+export CMAKE     ?= cmake
+export PYTHON    ?= python
+export XXD       ?= xxd
+export CURL      ?= curl
+export GIT       ?= git
+export FIND      ?= find
+export CP        ?= cp
+export MKDIR     ?= mkdir
+export MV        ?= mv
+export PATCH     ?= git apply --ignore-whitespace --ignore-space-change
+export TAR       ?= tar
+export WGET      ?= wget
+export CAT       ?= cat
+export TOUCH     ?= touch
+
+## Setup CAD tools
+# If the machine you are working on is bsg_cadenv compliant, then you do not
+# need to setup the cad tools, simply put bsg_cadenv in the same root dir.
+BSG_CADENV_DIR ?= $(TT_ROOT)/bsg_cadenv
+-include $(BSG_CADENV_DIR)/cadenv.mk
+
+export PATH := $(TT_INSTALL_BIN_DIR):$(PATH)
+

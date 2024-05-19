@@ -8,3 +8,5 @@ output.json
 slpp_all
 check.rpt
 stat.rpt
+*.swp
+install/

@@ -1,16 +1,16 @@
 include Makefile.common
 
-python311_tag := $(TT_INSTALL_TOUCH_DIR)/python311.any
 openssl_tag   := $(TT_INSTALL_TOUCH_DIR)/openssl.any
+python311_tag := $(TT_INSTALL_TOUCH_DIR)/python311.any
 venv_tag      := $(TT_INSTALL_TOUCH_DIR)/venv.any
 verilator_tag := $(TT_INSTALL_TOUCH_DIR)/verilator.any
-iverilog_tag := $(TT_INSTALL_TOUCH_DIR)/iverilog.any
-synlig_tag := $(TT_INSTALL_TOUCH_DIR)/synlig.any
+iverilog_tag  := $(TT_INSTALL_TOUCH_DIR)/iverilog.any
+synlig_tag    := $(TT_INSTALL_TOUCH_DIR)/synlig.any
 
 all:
 	@echo "Targets:"
-	@echo "\tmake venv"
-	@echo "\tmake tools"
+	@echo "    make venv"
+	@echo "    make tools"
 
 check_venv:
 	python -c "import os; os.environ['VIRTUAL_ENV']" || echo ".venv not activated"
@@ -42,14 +42,15 @@ $(python311_tag): $(openssl_tag)
 		$(WGET) -qO- $(PYTHON311_URL) | $(TAR) xzv
 	cd $(TT_INSTALL_WORK_DIR)/$(PYTHON311); \
 		./configure \
-			LDFLAGS="-L$(OPENSSL_INSTALL)/lib" \
+			--enable-shared \
+			--prefix=$(TT_INSTALL_DIR) \
 			--with-openssl=$(OPENSSL_INSTALL) \
 			--with-openssl-rpath=auto \
-			--prefix=$(TT_INSTALL_DIR)
+			LDFLAGS="-Wl,--rpath=$(OPENSSL_INSTALL)/lib -Wl,--rpath=$(TT_INSTALL_DIR)/lib"
 	$(MAKE) -C $(TT_INSTALL_WORK_DIR)/$(PYTHON311) altinstall
 	$(TOUCH) $@
 
-$(venv_tag): | $(openssl_tag) $(python311_tag)
+$(venv_tag): | $(python311_tag)
 	$(TT_INSTALL_BIN_DIR)/python3.11 -m venv $(VENV_ROOT)
 	cd $(TT_TOOL_ROOT) && git apply $(PATCH_ROOT)/tt-support-tools/* || git apply --reverse --check $(PATCH_ROOT)/tt-support-tools/*
 	$(VENV_ROOT)/bin/pip install --upgrade pip
@@ -75,4 +76,7 @@ $(synlig_tag): check_venv
 	cp -r $(SYNLIG_ROOT)/out/release/bin/* $(VENV_ROOT)/lib
 	cp -r $(SYNLIG_ROOT)/out/release/bin/* $(VENV_ROOT)/share
 	touch $@
+
+clean:
+	rm -rf $(TT_INSTALL_DIR)
 

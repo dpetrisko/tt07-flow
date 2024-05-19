@@ -1,4 +1,4 @@
-TOP := $(shell git rev-parse --show-toplevel)
+TOP ?= $(shell git rev-parse --show-toplevel)
 
 # Set directory structure
 export TT_ROOT              ?= $(TOP)
@@ -8,10 +8,6 @@ export PDK_TYPE             ?= sky130_fd_sc_hd
 export PROJ_ROOT            ?= $(TT_ROOT)/tt07-dll
 export PATH                 ?= $(TT_ROOT)/synlig/out/current/bin:$(PATH)
 export BASEJUMP_STL_DIR     ?= $(PROJ_ROOT)/src/basejump_stl
-export OPENLANE_ROOT        ?= $(TT_ROOT)/OpenLane
-export VERILATOR_ROOT       ?= $(TT_ROOT)/verilator
-export IVERILOG_ROOT        ?= $(TT_ROOT)/iverilog
-export SYNLIG_ROOT          ?= $(TT_ROOT)/synlig
 export PATCH_ROOT           ?= $(TT_ROOT)/patches
 export TT_TOOL_ROOT         ?= $(TT_ROOT)/tt-support-tools
 export TT_INSTALL_DIR       ?= $(TT_ROOT)/install

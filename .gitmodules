@@ -6,10 +6,6 @@
     path = verilator
     url = https://github.com/verilator/verilator.git
     ignore = dirty
-[submodule "OpenLane"]
-    path = OpenLane
-    url = https://github.com/The-OpenROAD-Project/OpenLane.git
-    ignore = dirty
 [submodule "synlig"]
     path = synlig
     url = https://github.com/chipsalliance/synlig.git
@@ -30,3 +26,6 @@
     update = none
     branch = master
 
+[submodule "openlane2"]
+	path = openlane2
+	url = https://github.com/efabless/openlane2.git

@@ -1,5 +1,10 @@
 include Makefile.common
 
+OPENLANE_ROOT  ?= $(TT_ROOT)/OpenLane
+VERILATOR_ROOT ?= $(TT_ROOT)/verilator
+IVERILOG_ROOT  ?= $(TT_ROOT)/iverilog
+SYNLIG_ROOT    ?= $(TT_ROOT)/synlig
+
 openssl_tag   := $(TT_INSTALL_TOUCH_DIR)/openssl.any
 python311_tag := $(TT_INSTALL_TOUCH_DIR)/python311.any
 venv_tag      := $(TT_INSTALL_TOUCH_DIR)/venv.any

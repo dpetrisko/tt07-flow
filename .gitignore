@@ -10,3 +10,4 @@ check.rpt
 stat.rpt
 *.swp
 install/
+.volare/

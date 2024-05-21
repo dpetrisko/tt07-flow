@@ -58,7 +58,6 @@ $(python311_tag): | $(openssl_tag)
 
 $(venv_tag): | $(python311_tag)
 	$(TT_INSTALL_BIN_DIR)/python3.11 -m venv $(VENV_ROOT)
-	cd $(TT_TOOL_ROOT) && git apply $(PATCH_ROOT)/tt-support-tools/* || git apply --reverse --check $(PATCH_ROOT)/tt-support-tools/*
 	$(VENV_ROOT)/bin/pip install --upgrade pip
 	$(VENV_ROOT)/bin/pip install -r $(TT_ROOT)/requirements.txt
 	$(VENV_ROOT)/bin/pip install -r $(TT_TOOL_ROOT)/requirements.txt

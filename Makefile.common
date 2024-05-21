@@ -17,6 +17,8 @@ export PDK                  ?= sky130A
 export PDK_VERSION          ?= dd7771c384ed36b91a25e9f8b314355fc26561be
 export PDK_TYPE             ?= sky130_fd_sc_hd
 
+export BSG_SV2V_DIR ?= $(TT_ROOT)/bsg_sv2v
+
 ## Set variables needed for building tools
 export GCC       ?= gcc
 export CMAKE     ?= cmake

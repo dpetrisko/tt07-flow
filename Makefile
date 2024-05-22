@@ -1,9 +1,12 @@
 include Makefile.common
 
-OPENLANE_ROOT  ?= $(TT_ROOT)/OpenLane
+PATCH_ROOT     ?= $(TT_ROOT)/patches
+TT_TOOL_ROOT   ?= $(TT_ROOT)/tt-support-tools
+OPENLANE_ROOT  ?= $(TT_ROOT)/openlane2
 VERILATOR_ROOT ?= $(TT_ROOT)/verilator
 IVERILOG_ROOT  ?= $(TT_ROOT)/iverilog
 SYNLIG_ROOT    ?= $(TT_ROOT)/synlig
+SV2V_ROOT      ?= $(TT_ROOT)/bsg_sv2v
 
 openssl_tag   := $(TT_INSTALL_TOUCH_DIR)/openssl.any
 python311_tag := $(TT_INSTALL_TOUCH_DIR)/python311.any
@@ -11,27 +14,36 @@ venv_tag      := $(TT_INSTALL_TOUCH_DIR)/venv.any
 verilator_tag := $(TT_INSTALL_TOUCH_DIR)/verilator.any
 iverilog_tag  := $(TT_INSTALL_TOUCH_DIR)/iverilog.any
 synlig_tag    := $(TT_INSTALL_TOUCH_DIR)/synlig.any
+sv2v_tag      := $(TT_INSTALL_TOUCH_DIR)/bsg_sv2v.any
 pdk_tag       := $(TT_INSTALL_TOUCH_DIR)/pdk.$(PDK_VERSION)
+tttool_tag    := $(TT_INSTALL_TOUCH_DIR)/tttool.any
 
-all:
+help:
 	@echo "Targets:"
 	@echo "    make venv"
 	@echo "    make tools"
 
-check_venv:
-	python -c "import os; os.environ['VIRTUAL_ENV']" || echo ".venv not activated"
+_check_venv:
+	python -c "import os; os.environ['VIRTUAL_ENV']" || (echo "venv not detected" && false)
+	echo "venv detected!"
 
 venv: | $(venv_tag)
-tools: | $(verilator_tag) $(iverilog_tag) $(synlig_tag) $(pdk_tag)
+tools: $(verilator_tag) $(iverilog_tag) $(synlig_tag) $(pdk_tag) $(sv2v_tag) $(openlane_tag)
 
 $(TT_INSTALL_WORK_DIR) $(TT_INSTALL_TOUCH_DIR):
 	mkdir -p $@
+
+_setup: $(TT_INSTALL_WORK_DIR) $(TT_INSTALL_TOUCH_DIR)
+	git submodule update --init --recursive
+	# Checkout cadenv if we can
+	-git submodule update --init --checkout $(BSG_CADENV_DIR) || true
 
 OPENSSL_VERSION := 1.1.1w
 OPENSSL := openssl-$(OPENSSL_VERSION)
 OPENSSL_URL := https://www.openssl.org/source/$(OPENSSL).tar.gz
 OPENSSL_INSTALL := $(TT_INSTALL_DIR)/openssl
-$(openssl_tag): $(TT_INSTALL_WORK_DIR) $(TT_INSTALL_TOUCH_DIR)
+$(openssl_tag):
+	$(MAKE) _setup
 	cd $(TT_INSTALL_WORK_DIR); \
 		$(WGET) -qO- $(OPENSSL_URL) | $(TAR) xzv
 	cd $(TT_INSTALL_WORK_DIR)/$(OPENSSL); \
@@ -56,7 +68,12 @@ $(python311_tag): | $(openssl_tag)
 	$(MAKE) -C $(TT_INSTALL_WORK_DIR)/$(PYTHON311) altinstall
 	touch $@
 
-$(venv_tag): | $(python311_tag)
+$(tttool_tag): | $(python311_tag)
+	-cd $(TT_TOOL_ROOT); \
+		git apply $(PATCH_ROOT)/tt-support-tools/*
+	touch $@
+
+$(venv_tag): | $(tttool_tag)
 	$(TT_INSTALL_BIN_DIR)/python3.11 -m venv $(VENV_ROOT)
 	$(VENV_ROOT)/bin/pip install --upgrade pip
 	$(VENV_ROOT)/bin/pip install -r $(TT_ROOT)/requirements.txt
@@ -64,17 +81,20 @@ $(venv_tag): | $(python311_tag)
 	$(VENV_ROOT)/bin/pip install -r $(PROJ_ROOT)/test/requirements.txt
 	touch $@
 
-$(verilator_tag): check_venv
+$(verilator_tag): | $(venv_tag)
+	$(MAKE) _check_venv
 	cd $(VERILATOR_ROOT); \
 		autoconf && ./configure --prefix=$(VENV_ROOT) && $(MAKE) && $(MAKE) install
 	touch $@
 
-$(iverilog_tag): check_venv
+$(iverilog_tag): | $(venv_tag)
+	$(MAKE) _check_venv
 	cd $(IVERILOG_ROOT); \
 		autoconf && ./configure --prefix=$(VENV_ROOT) && $(MAKE) && $(MAKE) install
 	touch $@
 
-$(synlig_tag): check_venv
+$(synlig_tag): | $(venv_tag)
+	$(MAKE) _check_venv
 	cd $(SYNLIG_ROOT); \
 		$(MAKE) install
 	cp -r $(SYNLIG_ROOT)/out/release/bin/* $(VENV_ROOT)/bin
@@ -82,12 +102,30 @@ $(synlig_tag): check_venv
 	cp -r $(SYNLIG_ROOT)/out/release/bin/* $(VENV_ROOT)/share
 	touch $@
 
-$(pdk_tag): check_venv
+$(pdk_tag): | $(venv_tag)
+	$(MAKE) _check_venv
 	volare enable --pdk-root=$(PDK_ROOT) --pdk=sky130 $(PDK_VERSION)
 	cd $(PDK_ROOT); \
-		git init; git commit -am "Initial commit"; git apply $(PATCH_ROOT)/.volare/*.patch
+		git init; git commit -am "Initial commit"; cd -
 	touch $@
 
-clean:
-	rm -rf $(TT_INSTALL_DIR)
+$(sv2v_tag): | $(venv_tag)
+	$(MAKE) _check_venv
+	rm -rf $(TT_INSTALL_WORK_DIR)/Pyverilog
+	git clone -b 1.1.3 https://github.com/PyHDI/Pyverilog.git $(TT_INSTALL_WORK_DIR)/Pyverilog
+	cd $(TT_INSTALL_WORK_DIR)/Pyverilog; git apply $(SV2V_ROOT)/patches/pyverilog_*.patch
+	cd $(TT_INSTALL_WORK_DIR)/Pyverilog;  $(PIP) install --force-reinstall .
+	cd $(SV2V_ROOT); git apply $(PATCH_ROOT)/bsg_sv2v/*
+	touch $@
+
+$(openlane2_tag): | $(venv_tag)
+	$(MAKE) _check_venv
+	cd $(OPENLANE_ROOT); $(PIP) install --force-reinstall .
+	touch $@
+
+## This target just wipes the whole repo clean.
+#  Use with caution.
+bleach_all:
+	rm -rf $(TT_INSTALL_DIR)/
+	cd $(TOP); git clean -fdx; git submodule deinit -f .
 

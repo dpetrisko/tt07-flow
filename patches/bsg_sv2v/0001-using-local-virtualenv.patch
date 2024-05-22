@@ -1,0 +1,22 @@
+diff --git a/Makefile b/Makefile
+index 2303f3b..020df01 100644
+--- a/Makefile
++++ b/Makefile
+@@ -77,14 +77,14 @@ else ifeq (clean_tools,$(MAKECMDGOALS))
+ else ifeq (deep_clean,$(MAKECMDGOALS))
+ else
+   ifeq (,$(shell which $(IVERILOG_BUILD_DIR)/ivl))
+-    $(error "iverilog is missing; see instructions; run make tools")
++#    $(error "iverilog is missing; see instructions; run make tools")
+   endif
+ endif
+ 
+ # Use these in place for your normal python and pip commands. This will use the
+ # virtualenv python and pip which has the installed dependancies.
+-PYTHON :=source $(VIRTUALENV_BUILD_DIR)/bin/activate; python
+-PIP    :=source $(VIRTUALENV_BUILD_DIR)/bin/activate; python -m pip
++#PYTHON :=source $(VIRTUALENV_BUILD_DIR)/bin/activate; python
++#PIP    :=source $(VIRTUALENV_BUILD_DIR)/bin/activate; python -m pip
+ 
+ # Update path variable as needed
+ export PATH:=$(PATH):$(IVERILOG_BUILD_DIR)/install/bin

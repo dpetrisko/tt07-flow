@@ -61,16 +61,18 @@ $(python311_tag): | $(openssl_tag)
 	cd $(TT_INSTALL_WORK_DIR)/$(PYTHON311); \
 		./configure \
 			--enable-shared \
+			--enable-optimizations \
 			--prefix=$(TT_INSTALL_DIR) \
 			--with-openssl=$(OPENSSL_INSTALL) \
 			--with-openssl-rpath=auto \
+			TCLTK_LIBS="-ltk8.5 -ltcl8.5" \
 			LDFLAGS="-Wl,--rpath=$(OPENSSL_INSTALL)/lib -Wl,--rpath=$(TT_INSTALL_DIR)/lib"
 	$(MAKE) -C $(TT_INSTALL_WORK_DIR)/$(PYTHON311) altinstall
 	touch $@
 
 $(tttool_tag): | $(python311_tag)
 	-cd $(TT_TOOL_ROOT); \
-		git apply $(PATCH_ROOT)/tt-support-tools/*
+		git checkout tt07; git apply $(PATCH_ROOT)/tt-support-tools/*
 	touch $@
 
 $(venv_tag): | $(tttool_tag)

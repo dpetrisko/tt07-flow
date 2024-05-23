@@ -1,0 +1,22 @@
+diff --git a/project.py b/project.py
+index 1441bda..2e0e7d2 100644
+--- a/project.py
++++ b/project.py
+@@ -288,7 +288,7 @@ class Project:
+         return Repo(self.local_dir).commit().hexsha
+ 
+     def get_tt_tools_version(self):
+-        repo = Repo(os.path.join(self.local_dir, "tt"))
++        repo = Repo(os.path.join(self.local_dir, "../tt-support-tools"))
+         return f"{repo.active_branch.name} {repo.commit().hexsha[:8]}"
+ 
+     def read_commit_info_json(self) -> typing.Dict[str, typing.Any]:
+@@ -461,7 +461,7 @@ class Project:
+             fh.write(f"# Project area: {tiles} tiles\n")
+             fh.write(f'set ::env(DIE_AREA) "{die_area}"\n')
+             fh.write(
+-                f'set ::env(FP_DEF_TEMPLATE) "$::env(DESIGN_DIR)/../tt/def/tt_block_{tiles}_pg.def"\n'
++                f'set ::env(FP_DEF_TEMPLATE) "$::env(DESIGN_DIR)/../../tt-support-tools/def/tt_block_{tiles}_pg.def"\n'
+             )
+ 
+     def golden_harden(self):

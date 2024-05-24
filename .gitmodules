@@ -26,8 +26,8 @@
     update = none
     branch = master
 [submodule "openlane2"]
-    path = openlane2
-    url = https://github.com/efabless/openlane2.git
+	path = openlane2
+	url = https://github.com/efabless/openlane2
     ignore = dirty
 [submodule "bsg_sv2v"]
     path = bsg_sv2v

@@ -4,6 +4,7 @@ TOP ?= $(shell git rev-parse --show-toplevel)
 export TT_ROOT              ?= $(TOP)
 export PROJ_ROOT            ?= $(TT_ROOT)/tt07-dll
 export BASEJUMP_STL_DIR     ?= $(PROJ_ROOT)/src/basejump_stl
+export TT_TOOL_ROOT         ?= $(TT_ROOT)/tt-support-tools
 export TT_INSTALL_DIR       ?= $(TT_ROOT)/install
 export TT_INSTALL_BIN_DIR   ?= $(TT_INSTALL_DIR)/bin
 export TT_INSTALL_LIB_DIR   ?= $(TT_INSTALL_DIR)/lib
@@ -12,7 +13,7 @@ export TT_INSTALL_TOUCH_DIR ?= $(TT_INSTALL_DIR)/touchfiles
 export VENV_ROOT            ?= $(TT_INSTALL_DIR)/venv
 export PDK_ROOT             ?= $(TT_INSTALL_DIR)/volare
 export PDK                  ?= sky130A
-export PDK_VERSION          ?= dd7771c384ed36b91a25e9f8b314355fc26561be
+export PDK_VERSION          ?= bdc9412b3e468c102d01b7cf6337be06ec6e9c9a
 export PDK_TYPE             ?= sky130_fd_sc_hd
 
 export BSG_SV2V_DIR ?= $(TT_ROOT)/bsg_sv2v

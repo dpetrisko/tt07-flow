@@ -1,12 +1,5 @@
 include Makefile.common
 
-PATCH_ROOT     ?= $(TT_ROOT)/patches
-OPENLANE_ROOT  ?= $(TT_ROOT)/openlane2
-VERILATOR_ROOT ?= $(TT_ROOT)/verilator
-IVERILOG_ROOT  ?= $(TT_ROOT)/iverilog
-SYNLIG_ROOT    ?= $(TT_ROOT)/synlig
-SV2V_ROOT      ?= $(TT_ROOT)/bsg_sv2v
-
 tcl_tag       := $(TT_INSTALL_TOUCH_DIR)/tcl.any
 tk_tag        := $(TT_INSTALL_TOUCH_DIR)/tk.any
 openssl_tag   := $(TT_INSTALL_TOUCH_DIR)/openssl.any
@@ -15,10 +8,12 @@ venv_tag      := $(TT_INSTALL_TOUCH_DIR)/venv.any
 verilator_tag := $(TT_INSTALL_TOUCH_DIR)/verilator.any
 iverilog_tag  := $(TT_INSTALL_TOUCH_DIR)/iverilog.any
 synlig_tag    := $(TT_INSTALL_TOUCH_DIR)/synlig.any
+yosys_tag     := $(TT_INSTALL_TOUCH_DIR)/yosys.any
 sv2v_tag      := $(TT_INSTALL_TOUCH_DIR)/bsg_sv2v.any
 pdk_tag       := $(TT_INSTALL_TOUCH_DIR)/pdk.$(PDK_VERSION)
 ttsupport_tag := $(TT_INSTALL_TOUCH_DIR)/ttsupport.any
 openlane_tag  := $(TT_INSTALL_TOUCH_DIR)/openlane.any
+opensta_tag   := $(TT_INSTALL_TOUCH_DIR)/opensta.any
 
 help:
 	@echo "Targets:"
@@ -28,10 +23,12 @@ help:
 venv: | $(venv_tag)
 tools:
 	$(MAKE) $(iverilog_tag)
-	$(MAKE) $(verilator_tag)
-	$(MAKE) $(synlig_tag)
+	VERILATOR_ROOT="" $(MAKE) $(verilator_tag)
+	#$(MAKE) $(synlig_tag)
+	$(MAKE) $(yosys_tag)
 	$(MAKE) $(sv2v_tag)
 	$(MAKE) $(pdk_tag)
+	$(MAKE) $(opensta_tag)
 	$(MAKE) $(openlane_tag)
 
 $(TT_INSTALL_WORK_DIR) $(TT_INSTALL_TOUCH_DIR):
@@ -131,6 +128,13 @@ $(iverilog_tag): | $(venv_tag)
 		autoconf && ./configure --prefix=$(VENV_ROOT) && $(MAKE) && $(MAKE) install
 	touch $@
 
+$(yosys_tag): | $(venv_tag)
+	$(MAKE) _check_venv
+	cd $(YOSYS_ROOT) && git apply $(PATCH_ROOT)/yosys/*
+	$(MAKE) -C $(YOSYS_ROOT)
+	$(MAKE) -C $(YOSYS_ROOT) install PREFIX=$(VENV_ROOT)
+	touch $@
+
 $(synlig_tag): | $(venv_tag)
 	$(MAKE) _check_venv
 	cd $(SYNLIG_ROOT); \
@@ -155,6 +159,19 @@ $(sv2v_tag): | $(venv_tag)
 	cd $(TT_INSTALL_WORK_DIR)/Pyverilog;  $(PIP) install --force-reinstall .
 	cd $(SV2V_ROOT); git apply $(PATCH_ROOT)/bsg_sv2v/*
 	touch $@
+
+$(opensta_tag): | $(venv_tag)
+	$(MAKE) _check_venv
+	mkdir -p $(TT_INSTALL_WORK_DIR)/opensta_build
+	cd $(TT_INSTALL_WORK_DIR)/opensta_build; \
+		wget https://sourceforge.net/projects/swig/files/swig/swig-3.0.0/swig-3.0.0.tar.gz; \
+		tar -xzvf swig-3.0.0.tar.gz
+	cd $(TT_INSTALL_WORK_DIR)/opensta_build/swig-3.0.0; \
+		./configure --prefix=$(VENV_ROOT); \
+		$(MAKE)
+	cd $(TT_INSTALL_WORK_DIR)/opensta_build; \
+		cmake $(OPENSTA_ROOT); \
+		$(MAKE)
 
 $(openlane_tag): | $(venv_tag)
 	$(MAKE) _check_venv

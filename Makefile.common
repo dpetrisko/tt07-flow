@@ -17,6 +17,14 @@ export PDK_VERSION          ?= bdc9412b3e468c102d01b7cf6337be06ec6e9c9a
 export PDK_TYPE             ?= sky130_fd_sc_hd
 
 export BSG_SV2V_DIR ?= $(TT_ROOT)/bsg_sv2v
+export PATCH_ROOT     ?= $(TT_ROOT)/patches
+export OPENLANE_ROOT  ?= $(TT_ROOT)/openlane2
+export VERILATOR_ROOT ?= $(TT_ROOT)/verilator
+export IVERILOG_ROOT  ?= $(TT_ROOT)/iverilog
+export SYNLIG_ROOT    ?= $(TT_ROOT)/synlig
+export YOSYS_ROOT     ?= $(TT_ROOT)/yosys
+export SV2V_ROOT      ?= $(TT_ROOT)/bsg_sv2v
+export OPENSTA_ROOT   ?= $(TT_ROOT)/OpenSTA
 
 ## Set variables needed for building tools
 export GCC       ?= gcc

@@ -1,0 +1,25 @@
+From d6492337e80261b0b2d6e7c8ab7aeaf7a4026f7c Mon Sep 17 00:00:00 2001
+From: Dan Petrisko <petrisko@cs.washington.edu>
+Date: Sat, 25 May 2024 00:56:04 -0700
+Subject: [PATCH] Change to gcc
+
+---
+ Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 00fd26bb1..9f4dbbde6 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,6 +1,6 @@
+ 
+-CONFIG := clang
+-# CONFIG := gcc
++#CONFIG := clang
++CONFIG := gcc
+ # CONFIG := afl-gcc
+ # CONFIG := emcc
+ # CONFIG := wasi
+-- 
+2.16.5
+

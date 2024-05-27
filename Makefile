@@ -1,19 +1,22 @@
 include Makefile.common
 
-tcl_tag       := $(TT_INSTALL_TOUCH_DIR)/tcl.any
-tk_tag        := $(TT_INSTALL_TOUCH_DIR)/tk.any
-openssl_tag   := $(TT_INSTALL_TOUCH_DIR)/openssl.any
-python311_tag := $(TT_INSTALL_TOUCH_DIR)/python311.any
-venv_tag      := $(TT_INSTALL_TOUCH_DIR)/venv.any
-verilator_tag := $(TT_INSTALL_TOUCH_DIR)/verilator.any
-iverilog_tag  := $(TT_INSTALL_TOUCH_DIR)/iverilog.any
-synlig_tag    := $(TT_INSTALL_TOUCH_DIR)/synlig.any
-yosys_tag     := $(TT_INSTALL_TOUCH_DIR)/yosys.any
-sv2v_tag      := $(TT_INSTALL_TOUCH_DIR)/bsg_sv2v.any
-pdk_tag       := $(TT_INSTALL_TOUCH_DIR)/pdk.$(PDK_VERSION)
-ttsupport_tag := $(TT_INSTALL_TOUCH_DIR)/ttsupport.any
-openlane_tag  := $(TT_INSTALL_TOUCH_DIR)/openlane.any
-opensta_tag   := $(TT_INSTALL_TOUCH_DIR)/opensta.any
+tcl_tag       := $(TT_INSTALL_TOUCH_DIR)/venv/tcl.any
+tk_tag        := $(TT_INSTALL_TOUCH_DIR)/venv/tk.any
+openssl_tag   := $(TT_INSTALL_TOUCH_DIR)/venv/openssl.any
+python311_tag := $(TT_INSTALL_TOUCH_DIR)/venv/python311.any
+ttsupport_tag := $(TT_INSTALL_TOUCH_DIR)/venv/ttsupport.any
+venv_tag      := $(TT_INSTALL_TOUCH_DIR)/venv/venv.any
+
+verilator_tag := $(TT_INSTALL_TOUCH_DIR)/tools/verilator.any
+iverilog_tag  := $(TT_INSTALL_TOUCH_DIR)/tools/iverilog.any
+synlig_tag    := $(TT_INSTALL_TOUCH_DIR)/tools/synlig.any
+yosys_tag     := $(TT_INSTALL_TOUCH_DIR)/tools/yosys.any
+sv2v_tag      := $(TT_INSTALL_TOUCH_DIR)/tools/bsg_sv2v.any
+pdk_tag       := $(TT_INSTALL_TOUCH_DIR)/tools/pdk.$(PDK_VERSION)
+swig_tag      := $(TT_INSTALL_TOUCH_DIR)/tools/swig.any
+openlane_tag  := $(TT_INSTALL_TOUCH_DIR)/tools/openlane.any
+openroad_tag  := $(TT_INSTALL_TOUCH_DIR)/tools/openroad.any
+opensta_tag   := $(TT_INSTALL_TOUCH_DIR)/tools/opensta.any
 
 help:
 	@echo "Targets:"
@@ -23,16 +26,18 @@ help:
 venv: | $(venv_tag)
 tools:
 	$(MAKE) $(iverilog_tag)
-	VERILATOR_ROOT="" $(MAKE) $(verilator_tag)
+	$(MAKE) $(verilator_tag)
 	#$(MAKE) $(synlig_tag)
 	$(MAKE) $(yosys_tag)
 	$(MAKE) $(sv2v_tag)
 	$(MAKE) $(pdk_tag)
 	$(MAKE) $(opensta_tag)
+	$(MAKE) $(openroad_tag)
 	$(MAKE) $(openlane_tag)
 
 $(TT_INSTALL_WORK_DIR) $(TT_INSTALL_TOUCH_DIR):
-	mkdir -p $@
+	mkdir -p $@/venv
+	mkdir -p $@/tools
 
 _setup: $(TT_INSTALL_WORK_DIR) $(TT_INSTALL_TOUCH_DIR)
 	git submodule update --init --recursive
@@ -118,7 +123,7 @@ $(venv_tag): | $(ttsupport_tag)
 
 $(verilator_tag): | $(venv_tag)
 	$(MAKE) _check_venv
-	cd $(VERILATOR_ROOT); \
+	cd $(VERILATOR_DIR); \
 		autoconf && ./configure --prefix=$(VENV_ROOT) && $(MAKE) && $(MAKE) install
 	touch $@
 
@@ -160,18 +165,35 @@ $(sv2v_tag): | $(venv_tag)
 	cd $(SV2V_ROOT); git apply $(PATCH_ROOT)/bsg_sv2v/*
 	touch $@
 
-$(opensta_tag): | $(venv_tag)
+SWIG_VERSION ?= 3.0.0
+SWIG ?= swig-$(SWIG_VERSION)
+SWIG_URL ?= https://sourceforge.net/projects/swig/files/swig/$(SWIG)/$(SWIG).tar.gz
+SWIG_INSTALL ?= $(TT_INSTALL_DIR)/swig-install
+$(swig_tag): | $(venv_tag)
+	$(MAKE) _check_venv
+	cd $(TT_INSTALL_WORK_DIR); \
+		$(WGET) -qO- $(SWIG_URL) | $(TAR) xzv
+	cd $(TT_INSTALL_WORK_DIR)/$(SWIG); \
+		./configure --prefix=$(SWIG_INSTALL); \
+		$(MAKE) && $(MAKE) install
+
+$(opensta_tag): | $(swig_tag)
 	$(MAKE) _check_venv
 	mkdir -p $(TT_INSTALL_WORK_DIR)/opensta_build
 	cd $(TT_INSTALL_WORK_DIR)/opensta_build; \
-		wget https://sourceforge.net/projects/swig/files/swig/swig-3.0.0/swig-3.0.0.tar.gz; \
-		tar -xzvf swig-3.0.0.tar.gz
-	cd $(TT_INSTALL_WORK_DIR)/opensta_build/swig-3.0.0; \
-		./configure --prefix=$(VENV_ROOT); \
-		$(MAKE)
+		PATH=$(SWIG_INSTALL)/bin:$(PATH) \
+		SWIG_EXECUTABLE=$(SWIG_INSTALL)/bin \
+		$(CMAKE) -DCMAKE_INSTALL_PREFIX=$(VENV_ROOT) $(OPENSTA_ROOT)
 	cd $(TT_INSTALL_WORK_DIR)/opensta_build; \
-		cmake $(OPENSTA_ROOT); \
-		$(MAKE)
+		$(MAKE) && $(MAKE) install
+
+$(openroad_tag): | $(swig_tag)
+	$(MAKE) _check_venv
+	mkdir -p $(TT_INSTALL_WORK_DIR)/openroad_build
+	cd $(TT_INSTALL_WORK_DIR)/openroad_build; \
+		PATH=$(SWIG_INSTALL)/bin:$(PATH) \
+		SWIG_EXECUTABLE=$(SWIG_INSTALL)/bin \
+		$(CMAKE) -DCMAKE_INSTALL_PREFIX=$(VENV_ROOT) $(OPENROAD_ROOT)
 
 $(openlane_tag): | $(venv_tag)
 	$(MAKE) _check_venv

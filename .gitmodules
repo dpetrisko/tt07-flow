@@ -26,18 +26,22 @@
     update = none
     branch = master
 [submodule "openlane2"]
-	path = openlane2
-	url = https://github.com/efabless/openlane2
+    path = openlane2
+    url = https://github.com/efabless/openlane2
     ignore = dirty
 [submodule "bsg_sv2v"]
     path = bsg_sv2v
     url = https://github.com/bespoke-silicon-group/bsg_sv2v
     ignore = dirty
-
 [submodule "yosys"]
     path = yosys
     url = https://github.com/YosysHQ/yosys.git
-
+    ignore = dirty
 [submodule "OpenSTA"]
-	path = OpenSTA
-	url = https://github.com/The-OpenROAD-Project/OpenSTA.git
+    path = OpenSTA
+    url = https://github.com/The-OpenROAD-Project/OpenSTA.git
+    ignore = dirty
+[submodule "OpenROAD"]
+    path = OpenROAD
+    url = https://github.com/The-OpenROAD-Project/OpenROAD.git
+    ignore = dirty

@@ -14,6 +14,13 @@ yosys_tag     := $(TT_INSTALL_TOUCH_DIR)/tools/yosys.any
 sv2v_tag      := $(TT_INSTALL_TOUCH_DIR)/tools/bsg_sv2v.any
 pdk_tag       := $(TT_INSTALL_TOUCH_DIR)/tools/pdk.$(PDK_VERSION)
 swig_tag      := $(TT_INSTALL_TOUCH_DIR)/tools/swig.any
+spdlog_tag    := $(TT_INSTALL_TOUCH_DIR)/tools/spdlog.any
+lemon_tag     := $(TT_INSTALL_TOUCH_DIR)/tools/lemon.any
+re2_tag       := $(TT_INSTALL_TOUCH_DIR)/tools/re2.any
+highs_tag     := $(TT_INSTALL_TOUCH_DIR)/tools/highs.any
+ortools_tag   := $(TT_INSTALL_TOUCH_DIR)/tools/ortools.any
+boost_tag     := $(TT_INSTALL_TOUCH_DIR)/tools/boost.any
+abseil_tag    := $(TT_INSTALL_TOUCH_DIR)/tools/abseil.any
 openlane_tag  := $(TT_INSTALL_TOUCH_DIR)/tools/openlane.any
 openroad_tag  := $(TT_INSTALL_TOUCH_DIR)/tools/openroad.any
 opensta_tag   := $(TT_INSTALL_TOUCH_DIR)/tools/opensta.any
@@ -119,6 +126,7 @@ $(venv_tag): | $(ttsupport_tag)
 	$(VENV_ROOT)/bin/pip install -r $(TT_ROOT)/requirements.txt
 	$(VENV_ROOT)/bin/pip install -r $(TT_TOOL_ROOT)/requirements.txt
 	$(VENV_ROOT)/bin/pip install -r $(PROJ_ROOT)/test/requirements.txt
+	cp $(subst -I,,$(firstword $(shell python3-config --includes)))/pyconfig.h $(VENV_ROOT)/include
 	touch $@
 
 $(verilator_tag): | $(venv_tag)
@@ -165,7 +173,7 @@ $(sv2v_tag): | $(venv_tag)
 	cd $(SV2V_ROOT); git apply $(PATCH_ROOT)/bsg_sv2v/*
 	touch $@
 
-SWIG_VERSION ?= 3.0.0
+SWIG_VERSION ?= 4.0.0
 SWIG ?= swig-$(SWIG_VERSION)
 SWIG_URL ?= https://sourceforge.net/projects/swig/files/swig/$(SWIG)/$(SWIG).tar.gz
 SWIG_INSTALL ?= $(TT_INSTALL_DIR)/swig-install
@@ -176,6 +184,105 @@ $(swig_tag): | $(venv_tag)
 	cd $(TT_INSTALL_WORK_DIR)/$(SWIG); \
 		./configure --prefix=$(SWIG_INSTALL); \
 		$(MAKE) && $(MAKE) install
+	touch $@
+
+SPDLOG_INSTALL ?= $(TT_INSTALL_DIR)/spdlog-install
+$(spdlog_tag): | $(venv_tag)
+	$(MAKE) _check_venv
+	cd $(TT_INSTALL_WORK_DIR); \
+		$(GIT) clone https://github.com/gabime/spdlog.git; \
+		cd spdlog && mkdir build && cd build; \
+		$(CMAKE) -DCMAKE_INSTALL_PREFIX=$(SPDLOG_INSTALL) .. && $(MAKE) && $(MAKE) install
+	touch $@
+
+LEMON_VERSION ?= 1.3.1
+LEMON ?= lemon-$(LEMON_VERSION)
+LEMON_URL ?= http://lemon.cs.elte.hu/pub/sources/$(LEMON).tar.gz
+LEMON_INSTALL ?= $(TT_INSTALL_DIR)/lemon-install
+$(lemon_tag): | $(venv_tag)
+	$(MAKE) _check_venv
+	cd $(TT_INSTALL_WORK_DIR); \
+		$(WGET) -qO- $(LEMON_URL) | $(TAR) xzv
+	cd $(TT_INSTALL_WORK_DIR)/$(LEMON); \
+		mkdir build && cd build; \
+		$(CMAKE) -DCMAKE_INSTALL_PREFIX=$(LEMON_INSTALL) .. && $(MAKE) && $(MAKE) install
+	touch $@
+
+ABSEIL_VERSION ?= master
+ABSEIL ?= abseil-$(ABSEIL_VERSION)
+ABSEIL_URL ?= https://github.com/abseil/abseil-cpp.git
+ABSEIL_INSTALL ?= $(TT_INSTALL_DIR)/abseil-install
+$(abseil_tag): | $(venv_tag)
+	$(MAKE) _check_venv
+	cd $(TT_INSTALL_WORK_DIR); \
+		git clone -b $(ABSEIL_VERSION) $(ABSEIL_URL) $(ABSEIL)
+	cd $(TT_INSTALL_WORK_DIR)/$(ABSEIL); \
+		mkdir build && cd build; \
+		$(CMAKE) -DCMAKE_INSTALL_PREFIX=$(ABSEIL_INSTALL) .. && $(MAKE) && $(MAKE) install
+	touch $@
+
+ORTOOLS_VERSION ?= _x86_64_CentOS-7.9.2009_cpp_v9.5.2237
+ORTOOLS ?= or-tools$(ORTOOLS_VERSION)
+ORTOOLS_URL ?= https://github.com/google/or-tools.git
+ORTOOLS_INSTALL ?= $(TT_INSTALL_DIR)/or-tools-install
+$(ortools_tag): | $(re2_tag) $(highs_tag)
+	$(MAKE) _check_venv
+	cd $(TT_INSTALL_WORK_DIR); \
+		git clone -b v9.5 $(ORTOOLS_URL) $(ORTOOLS)
+	cd $(TT_INSTALL_WORK_DIR)/$(ORTOOLS); \
+		mkdir build && cd build; \
+		$(CMAKE) -DBUILD_DEPS=ON \
+		-DUSE_SCIP=OFF \
+		-DUSE_COINOR=OFF \
+		-DUSE_SYSTEM_BOOST=ON \
+		-DCMAKE_INSTALL_PREFIX=$(ORTOOLS_INSTALL) .. && $(MAKE) && $(MAKE) install
+	touch $@
+
+BOOST_VERSION := 1.82.0
+BOOST := boost_$(subst .,_,$(BOOST_VERSION))
+BOOST_URL := https://sourceforge.net/projects/boost/files/boost/$(BOOST_VERSION)/$(BOOST).tar.gz/download
+BOOST_INSTALL := $(BP_SDK_INSTALL_DIR)/boost
+$(boost_tag):
+	cd $(TT_INSTALL_WORK_DIR); \
+		$(WGET) -qO- $(BOOST_URL) | $(TAR) xzv
+	cd $(TT_INSTALL_WORK_DIR)/$(BOOST); \
+		./bootstrap.sh --prefix=$(VENV_ROOT) \
+		--with-python=$(VENV_ROOT)/bin/python
+	cd $(TT_INSTALL_WORK_DIR)/$(BOOST); \
+		./b2 --prefix=$(VENV_ROOT) \
+		--with-iostreams --with-test --with-serialization --with-system --with-thread \
+		install
+	touch $@
+
+RE2_VERSION ?= main
+RE2 ?= re2-$(RE2_VERSION)
+RE2_URL ?= https://code.googlesource.com/re2
+RE2_INSTALL ?= $(TT_INSTALL_DIR)/re2-install
+$(re2_tag): | $(abseil_tag)
+	$(MAKE) _check_venv
+	cd $(TT_INSTALL_WORK_DIR); \
+		git clone -b $(RE2_VERSION) $(RE2_URL) $(RE2)
+	cd $(TT_INSTALL_WORK_DIR)/$(RE2); \
+		mkdir build && cd build; \
+		absl_DIR=$(ABSEIL_INSTALL) \
+		$(CMAKE)  -DCMAKE_INSTALL_PREFIX=$(RE2_INSTALL) .. && $(MAKE) && $(MAKE) install
+		$(MAKE) && $(MAKE) install
+	touch $@
+
+HIGHS_VERSION ?= master
+HIGHS ?= highs-$(HIGHS_VERSION)
+HIGHS_URL ?= https://github.com/ERGO-Code/HiGHS.git
+HIGHS_INSTALL ?= $(TT_INSTALL_DIR)/highs-install
+$(highs_tag): | $(abseil_tag)
+	$(MAKE) _check_venv
+	cd $(TT_INSTALL_WORK_DIR); \
+		git clone -b $(HIGHS_VERSION) $(HIGHS_URL) $(HIGHS)
+	cd $(TT_INSTALL_WORK_DIR)/$(HIGHS); \
+		mkdir build && cd build; \
+		absl_DIR=$(ABSEIL_INSTALL) \
+		$(CMAKE)  -DCMAKE_INSTALL_PREFIX=$(HIGHS_INSTALL) -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ .. && $(MAKE) && $(MAKE) install
+		$(MAKE) && $(MAKE) install
+	touch $@
 
 $(opensta_tag): | $(swig_tag)
 	$(MAKE) _check_venv
@@ -183,17 +290,25 @@ $(opensta_tag): | $(swig_tag)
 	cd $(TT_INSTALL_WORK_DIR)/opensta_build; \
 		PATH=$(SWIG_INSTALL)/bin:$(PATH) \
 		SWIG_EXECUTABLE=$(SWIG_INSTALL)/bin \
-		$(CMAKE) -DCMAKE_INSTALL_PREFIX=$(VENV_ROOT) $(OPENSTA_ROOT)
+		$(CMAKE) -DCMAKE_INSTALL_PREFIX=$(VENV_ROOT) -DBUILD_DEPS=ON $(OPENSTA_ROOT)
 	cd $(TT_INSTALL_WORK_DIR)/opensta_build; \
 		$(MAKE) && $(MAKE) install
+	touch $@
 
-$(openroad_tag): | $(swig_tag)
+$(openroad_tag): | $(swig_tag) $(spdlog_tag) $(lemon_tag) $(abseil_tag) $(ortools_tag) $(boost_tag)
 	$(MAKE) _check_venv
 	mkdir -p $(TT_INSTALL_WORK_DIR)/openroad_build
 	cd $(TT_INSTALL_WORK_DIR)/openroad_build; \
 		PATH=$(SWIG_INSTALL)/bin:$(PATH) \
 		SWIG_EXECUTABLE=$(SWIG_INSTALL)/bin \
-		$(CMAKE) -DCMAKE_INSTALL_PREFIX=$(VENV_ROOT) $(OPENROAD_ROOT)
+		absl_DIR=$(ABSEIL_INSTALL) \
+		lemon_DIR=$(LEMON_INSTALL) \
+		ortools_DIR=$(ORTOOLS_INSTALL) \
+		Protobuf_DIR=$(ORTOOLS_INSTALL) \
+		Cdl_DIR=$(ORTOOLS_INSTALL) \
+		spdlog_DIR=$(SPDLOG_INSTALL) \
+		$(CMAKE) -DCMAKE_INSTALL_PREFIX=$(VENV_ROOT) -DBUILD_DEPS=ON $(OPENROAD_ROOT)
+	touch $@
 
 $(openlane_tag): | $(venv_tag)
 	$(MAKE) _check_venv

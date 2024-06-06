@@ -16,7 +16,7 @@ export PDK                  ?= sky130A
 export PDK_VERSION          ?= bdc9412b3e468c102d01b7cf6337be06ec6e9c9a
 export PDK_TYPE             ?= sky130_fd_sc_hd
 
-export BSG_SV2V_DIR ?= $(TT_ROOT)/bsg_sv2v
+export BSG_SV2V_DIR   ?= $(TT_ROOT)/bsg_sv2v
 export PATCH_ROOT     ?= $(TT_ROOT)/patches
 export OPENLANE_ROOT  ?= $(TT_ROOT)/openlane2
 export VERILATOR_DIR  ?= $(TT_ROOT)/verilator
@@ -26,6 +26,14 @@ export YOSYS_ROOT     ?= $(TT_ROOT)/yosys
 export SV2V_ROOT      ?= $(TT_ROOT)/bsg_sv2v
 export OPENSTA_ROOT   ?= $(TT_ROOT)/OpenSTA
 export OPENROAD_ROOT  ?= $(TT_ROOT)/OpenROAD
+export SYNLIG_ROOT    ?= $(TT_ROOT)/synlig
+
+# Design variables
+export TT_NAME     ?= tt_um_dpetrisko_ttdll
+export SRC_DIR     ?= $(PROJ_ROOT)/src
+export TEST_DIR    ?= $(PROJ_ROOT)/test
+export SV2V_RESULT ?= $(SRC_DIR)/sv2v_build
+export USE_SYNLIG  ?= 0
 
 ## Set variables needed for building tools
 export GCC       ?= gcc
@@ -44,6 +52,14 @@ export TAR       ?= tar
 export WGET      ?= wget
 export CAT       ?= cat
 export TOUCH     ?= touch
+
+ifeq ($(USE_SYNLIG),1)
+export YOSYS        ?= $(SYNLIG_ROOT)/out/release/bin/yosys
+export YOSYS_CONFIG ?= $(SYNLIG_ROOT)/out/release/bin/yosys-config
+else
+export YOSYS        ?= yosys
+export YOSYS_CONFIG ?= yosys-config
+endif
 
 ## Setup CAD tools
 # If the machine you are working on is bsg_cadenv compliant, then you do not

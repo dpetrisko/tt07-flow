@@ -34,8 +34,8 @@ venv: | $(venv_tag)
 tools:
 	$(MAKE) $(iverilog_tag)
 	$(MAKE) $(verilator_tag)
-	#$(MAKE) $(synlig_tag)
 	$(MAKE) $(yosys_tag)
+	$(MAKE) $(synlig_tag)
 	$(MAKE) $(sv2v_tag)
 	$(MAKE) $(pdk_tag)
 	$(MAKE) $(opensta_tag)
@@ -141,20 +141,17 @@ $(iverilog_tag): | $(venv_tag)
 		autoconf && ./configure --prefix=$(VENV_ROOT) && $(MAKE) && $(MAKE) install
 	touch $@
 
+$(synlig_tag): | $(venv_tag)
+	$(MAKE) _check_venv
+	cd $(SYNLIG_ROOT); \
+		$(MAKE) install
+	touch $@
+
 $(yosys_tag): | $(venv_tag)
 	$(MAKE) _check_venv
 	cd $(YOSYS_ROOT) && git apply $(PATCH_ROOT)/yosys/*
 	$(MAKE) -C $(YOSYS_ROOT)
 	$(MAKE) -C $(YOSYS_ROOT) install PREFIX=$(VENV_ROOT)
-	touch $@
-
-$(synlig_tag): | $(venv_tag)
-	$(MAKE) _check_venv
-	cd $(SYNLIG_ROOT); \
-		$(MAKE) install
-	cp -r $(SYNLIG_ROOT)/out/release/bin/* $(VENV_ROOT)/bin
-	cp -r $(SYNLIG_ROOT)/out/release/bin/* $(VENV_ROOT)/lib
-	cp -r $(SYNLIG_ROOT)/out/release/bin/* $(VENV_ROOT)/share
 	touch $@
 
 $(pdk_tag): | $(venv_tag)

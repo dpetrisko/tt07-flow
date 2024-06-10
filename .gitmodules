@@ -45,3 +45,7 @@
     path = OpenROAD
     url = https://github.com/The-OpenROAD-Project/OpenROAD.git
     ignore = dirty
+[submodule "OpenRAM"]
+    path = OpenRAM
+    url = https://github.com/VLSIDA/OpenRAM.git
+    ignore = dirty

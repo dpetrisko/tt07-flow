@@ -24,6 +24,7 @@ abseil_tag    := $(TT_INSTALL_TOUCH_DIR)/tools/abseil.any
 openlane_tag  := $(TT_INSTALL_TOUCH_DIR)/tools/openlane.any
 openroad_tag  := $(TT_INSTALL_TOUCH_DIR)/tools/openroad.any
 opensta_tag   := $(TT_INSTALL_TOUCH_DIR)/tools/opensta.any
+openram_tag   := $(TT_INSTALL_TOUCH_DIR)/tools/openram.any
 
 help:
 	@echo "Targets:"
@@ -41,6 +42,7 @@ tools:
 	$(MAKE) $(opensta_tag)
 	$(MAKE) $(openroad_tag)
 	$(MAKE) $(openlane_tag)
+	$(MAKE) $(openram_tag)
 
 $(TT_INSTALL_WORK_DIR) $(TT_INSTALL_TOUCH_DIR):
 	mkdir -p $@/venv
@@ -292,6 +294,14 @@ $(opensta_tag): | $(swig_tag)
 		$(MAKE) && $(MAKE) install
 	touch $@
 
+$(openram_tag):
+	$(MAKE) _check_venv
+	cd $(OPENRAM_ROOT); \
+		$(MAKE) sky130-pdk sky130-install
+	cd $(OPENRAM_ROOT); \
+		$(MAKE) library
+	touch $@
+
 $(openroad_tag): | $(swig_tag) $(spdlog_tag) $(lemon_tag) $(abseil_tag) $(ortools_tag) $(boost_tag)
 	$(MAKE) _check_venv
 	mkdir -p $(TT_INSTALL_WORK_DIR)/openroad_build
@@ -309,7 +319,9 @@ $(openroad_tag): | $(swig_tag) $(spdlog_tag) $(lemon_tag) $(abseil_tag) $(ortool
 
 $(openlane_tag): | $(venv_tag)
 	$(MAKE) _check_venv
-	cd $(OPENLANE_ROOT); $(PIP) install --force-reinstall .
+	cd $(OPENLANE_ROOT); git apply $(PATCH_ROOT)/openlane2/*patch
+	cd $(OPENLANE_ROOT); \
+		$(PIP) install --force-reinstall .
 	touch $@
 
 clean:

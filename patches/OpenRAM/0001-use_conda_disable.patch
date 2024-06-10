@@ -1,0 +1,14 @@
+diff --git a/compiler/options.py b/compiler/options.py
+index d97ee70e..8ed10552 100644
+--- a/compiler/options.py
++++ b/compiler/options.py
+@@ -153,7 +153,8 @@ class options(optparse.Values):
+     top_process = None
+     # Use conda to install the default tools
+     # (existing tools will be used if disabled)
+-    use_conda = True
++    #use_conda = True
++    use_conda = False
+     # Variable to select the variant of spice
+     spice_name = None
+     # The spice executable being used which is derived from the user PATH.

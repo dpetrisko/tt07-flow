@@ -26,7 +26,12 @@ export YOSYS_ROOT     ?= $(TT_ROOT)/yosys
 export SV2V_ROOT      ?= $(TT_ROOT)/bsg_sv2v
 export OPENSTA_ROOT   ?= $(TT_ROOT)/OpenSTA
 export OPENROAD_ROOT  ?= $(TT_ROOT)/OpenROAD
+export OPENRAM_ROOT   ?= $(TT_ROOT)/OpenRAM
 export SYNLIG_ROOT    ?= $(TT_ROOT)/synlig
+
+export OPENRAM_HOME ?= $(OPENRAM_ROOT)/compiler
+export OPENRAM_TECH ?= $(OPENRAM_ROOT)/technology
+export PYTHONPATH   := $(OPENRAM_HOME):$(PYTHONPATH)
 
 # Design variables
 export TT_NAME     ?= tt_um_dpetrisko_ttdll

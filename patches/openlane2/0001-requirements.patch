@@ -1,0 +1,13 @@
+diff --git a/requirements.txt b/requirements.txt
+index 7b8d004..e6d3b74 100644
+--- a/requirements.txt
++++ b/requirements.txt
+@@ -1,7 +1,7 @@
+ click>=8,<9
+ cloup>=1.0.1,<2
+ pyyaml>=5,<7
+-rich>=12,<13
++rich>=13
+ volare>=0.16.0
+ lxml>=4.9.0
+ deprecated>=1.2.10,<2

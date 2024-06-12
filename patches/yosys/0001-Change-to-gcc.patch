@@ -1,5 +1,5 @@
 diff --git a/Makefile b/Makefile
-index 2e33a9503..b121c492e 100644
+index 2e33a9503..5dd327014 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -1,7 +1,7 @@
@@ -12,23 +12,3 @@ index 2e33a9503..b121c492e 100644
  # CONFIG := afl-gcc
  # CONFIG := emcc
  # CONFIG := wasi
-@@ -15,7 +15,8 @@ ENABLE_ABC := 1
- ENABLE_GLOB := 1
- ENABLE_PLUGINS := 1
- ENABLE_READLINE := 1
--ENABLE_EDITLINE := 0
-+#ENABLE_EDITLINE := 0
-+ENABLE_EDITLINE := 1
- ENABLE_GHDL := 0
- ENABLE_VERIFIC := 0
- ENABLE_VERIFIC_EDIF := 0
-@@ -23,7 +24,8 @@ ENABLE_VERIFIC_LIBERTY := 0
- DISABLE_VERIFIC_EXTENSIONS := 0
- DISABLE_VERIFIC_VHDL := 0
- ENABLE_COVER := 1
--ENABLE_LIBYOSYS := 0
-+#ENABLE_LIBYOSYS := 0
-+ENABLE_LIBYOSYS := 1
- ENABLE_ZLIB := 1
- 
- # python wrappers

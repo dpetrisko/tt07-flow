@@ -11,6 +11,7 @@ verilator_tag := $(TT_INSTALL_TOUCH_DIR)/tools/verilator.any
 iverilog_tag  := $(TT_INSTALL_TOUCH_DIR)/tools/iverilog.any
 synlig_tag    := $(TT_INSTALL_TOUCH_DIR)/tools/synlig.any
 yosys_tag     := $(TT_INSTALL_TOUCH_DIR)/tools/yosys.any
+slang_tag     := $(TT_INSTALL_TOUCH_DIR)/tools/slang.any
 sv2v_tag      := $(TT_INSTALL_TOUCH_DIR)/tools/bsg_sv2v.any
 pdk_tag       := $(TT_INSTALL_TOUCH_DIR)/tools/pdk.$(PDK_VERSION)
 swig_tag      := $(TT_INSTALL_TOUCH_DIR)/tools/swig.any
@@ -41,8 +42,9 @@ tools:
 	$(MAKE) $(pdk_tag)
 	$(MAKE) $(opensta_tag)
 	$(MAKE) $(openroad_tag)
-	$(MAKE) $(openlane_tag)
 	$(MAKE) $(openram_tag)
+	$(MAKE) $(openlane_tag)
+	$(MAKE) $(slang_tag)
 
 $(TT_INSTALL_WORK_DIR) $(TT_INSTALL_TOUCH_DIR):
 	mkdir -p $@/venv
@@ -152,8 +154,34 @@ $(synlig_tag): | $(venv_tag)
 $(yosys_tag): | $(venv_tag)
 	$(MAKE) _check_venv
 	cd $(YOSYS_ROOT) && git apply $(PATCH_ROOT)/yosys/*
-	$(MAKE) -C $(YOSYS_ROOT)
+	$(MAKE) -C $(YOSYS_ROOT) PREFIX=$(VENV_ROOT)
 	$(MAKE) -C $(YOSYS_ROOT) install PREFIX=$(VENV_ROOT)
+	touch $@
+
+SLANG_SOURCE_DIR ?= $(SLANG_ROOT)/third_party/slang
+SLANG_BUILD_DIR ?= $(SLANG_SOURCE_DIR)/build
+$(slang_tag): | $(yosys_tag)
+	$(MAKE) _check_venv
+	rm -rf $(SLANG_BUILD_DIR)
+	rm -rf $(VENV_ROOT)/share/yosys/plugins
+	$(CMAKE) -S $(SLANG_SOURCE_DIR) -B $(SLANG_BUILD_DIR) \
+		-DCMAKE_INSTALL_PREFIX=$(VENV_ROOT) \
+		-DCMAKE_BUILD_TYPE=Release \
+		-DSLANG_USE_MIMALLOC=OFF \
+		-DSLANG_INCLUDE_TESTS=OFF \
+		-DSLANG_INCLUDE_TOOLS=OFF \
+		-DBoost_NO_BOOST_CMAKE=ON \
+		-DCMAKE_CXX_FLAGS="-fPIC"
+	$(MAKE) -C $(SLANG_BUILD_DIR)
+	$(MAKE) -C $(SLANG_BUILD_DIR) install
+	mkdir -p $(VENV_ROOT)/share/yosys/plugins
+	cd $(SLANG_ROOT); \
+		$(VENV_ROOT)/bin/yosys-config --build $(VENV_ROOT)/share/yosys/plugins/slang.so \
+			-std=c++20 -fPIC \
+			-I$(VENV_ROOT)/share/yosys/include \
+			-I$(VENV_ROOT)/include \
+			-Wl,--whole-archive -L$(VENV_ROOT)/lib -lsvlang -lfmt -lmimalloc -Wl,--no-whole-archive \
+			slang_frontend.cc initial_eval.cc proc_usage.cc
 	touch $@
 
 $(pdk_tag): | $(venv_tag)
@@ -240,8 +268,8 @@ $(ortools_tag): | $(re2_tag) $(highs_tag)
 BOOST_VERSION := 1.82.0
 BOOST := boost_$(subst .,_,$(BOOST_VERSION))
 BOOST_URL := https://sourceforge.net/projects/boost/files/boost/$(BOOST_VERSION)/$(BOOST).tar.gz/download
-BOOST_INSTALL := $(BP_SDK_INSTALL_DIR)/boost
-$(boost_tag):
+$(boost_tag): | $(venv_tag)
+	$(MAKE) _check_venv
 	cd $(TT_INSTALL_WORK_DIR); \
 		$(WGET) -qO- $(BOOST_URL) | $(TAR) xzv
 	cd $(TT_INSTALL_WORK_DIR)/$(BOOST); \
@@ -297,7 +325,7 @@ $(opensta_tag): | $(swig_tag)
 $(openram_tag):
 	$(MAKE) _check_venv
 	cd $(OPENRAM_ROOT); \
-		$(MAKE) sky130-pdk sky130-install
+		$(MAKE) -j1 sky130-pdk sky130-install
 	cd $(OPENRAM_ROOT); \
 		$(MAKE) library
 	touch $@

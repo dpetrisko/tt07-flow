@@ -21,13 +21,13 @@ export PATCH_ROOT     ?= $(TT_ROOT)/patches
 export OPENLANE_ROOT  ?= $(TT_ROOT)/openlane2
 export VERILATOR_DIR  ?= $(TT_ROOT)/verilator
 export IVERILOG_ROOT  ?= $(TT_ROOT)/iverilog
-export SYNLIG_ROOT    ?= $(TT_ROOT)/synlig
 export YOSYS_ROOT     ?= $(TT_ROOT)/yosys
 export SV2V_ROOT      ?= $(TT_ROOT)/bsg_sv2v
 export OPENSTA_ROOT   ?= $(TT_ROOT)/OpenSTA
 export OPENROAD_ROOT  ?= $(TT_ROOT)/OpenROAD
 export OPENRAM_ROOT   ?= $(TT_ROOT)/OpenRAM
 export SYNLIG_ROOT    ?= $(TT_ROOT)/synlig
+export SLANG_ROOT     ?= $(TT_ROOT)/yosys-slang
 
 export OPENRAM_HOME ?= $(OPENRAM_ROOT)/compiler
 export OPENRAM_TECH ?= $(OPENRAM_ROOT)/technology

@@ -49,3 +49,8 @@
     path = OpenRAM
     url = https://github.com/VLSIDA/OpenRAM.git
     ignore = dirty
+[submodule "yosys-slang"]
+    path = yosys-slang
+    url = https://github.com/povik/yosys-slang.git
+    ignore = dirty
+

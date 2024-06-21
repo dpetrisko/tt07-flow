@@ -15,6 +15,8 @@ export PDK_ROOT             ?= $(TT_INSTALL_DIR)/volare
 export PDK                  ?= sky130A
 export PDK_VERSION          ?= bdc9412b3e468c102d01b7cf6337be06ec6e9c9a
 export PDK_TYPE             ?= sky130_fd_sc_hd
+export STD_CELL_LIBRARY     ?= $(PDK_TYPE)
+export STD_CELL_LIBRARY_OPT ?= $(PDK_TYPE)
 
 export BSG_SV2V_DIR   ?= $(TT_ROOT)/bsg_sv2v
 export PATCH_ROOT     ?= $(TT_ROOT)/patches
@@ -34,11 +36,12 @@ export OPENRAM_TECH ?= $(OPENRAM_ROOT)/technology
 export PYTHONPATH   := $(OPENRAM_HOME):$(PYTHONPATH)
 
 # Design variables
-export TT_NAME     ?= tt_um_dpetrisko_ttdll
-export SRC_DIR     ?= $(PROJ_ROOT)/src
-export TEST_DIR    ?= $(PROJ_ROOT)/test
-export SV2V_RESULT ?= $(SRC_DIR)/sv2v_build
-export USE_SYNLIG  ?= 0
+export TT_NAME      ?= tt_um_dpetrisko_ttdll
+export SRC_DIR      ?= $(PROJ_ROOT)/src
+export TEST_DIR     ?= $(PROJ_ROOT)/test
+export SV2V_RESULT  ?= $(SRC_DIR)/sv2v_build
+export USE_SYNLIG   ?= 0
+export USE_BSG_SV2V ?= 0
 
 ## Set variables needed for building tools
 export GCC       ?= gcc

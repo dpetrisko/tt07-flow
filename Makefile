@@ -188,7 +188,7 @@ $(pdk_tag): | $(venv_tag)
 	$(MAKE) _check_venv
 	volare enable --pdk-root=$(PDK_ROOT) --pdk=sky130 $(PDK_VERSION)
 	cd $(PDK_ROOT); \
-		git init; git commit -am "Initial commit"; cd -
+		git init; git add .; git commit -m "Initial commit"; cd -
 	touch $@
 
 $(sv2v_tag): | $(venv_tag)

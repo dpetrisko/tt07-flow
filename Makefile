@@ -37,7 +37,7 @@ tools:
 	$(MAKE) $(iverilog_tag)
 	$(MAKE) $(verilator_tag)
 	$(MAKE) $(yosys_tag)
-	$(MAKE) $(synlig_tag)
+	#$(MAKE) $(synlig_tag)
 	$(MAKE) $(sv2v_tag)
 	$(MAKE) $(pdk_tag)
 	$(MAKE) $(opensta_tag)
@@ -180,7 +180,7 @@ $(slang_tag): | $(yosys_tag)
 			-std=c++20 -fPIC \
 			-I$(VENV_ROOT)/share/yosys/include \
 			-I$(VENV_ROOT)/include \
-			-Wl,--whole-archive -L$(VENV_ROOT)/lib -lsvlang -lfmt -lmimalloc -Wl,--no-whole-archive \
+			-Wl,--whole-archive -L$(VENV_ROOT)/lib -lsvlang -lfmt -Wl,--no-whole-archive \
 			slang_frontend.cc initial_eval.cc proc_usage.cc
 	touch $@
 

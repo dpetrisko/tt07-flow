@@ -2,19 +2,22 @@
     path = iverilog
     url = https://github.com/steveicarus/iverilog.git
     ignore = dirty
+    branch = master
 [submodule "verilator"]
     path = verilator
     url = https://github.com/verilator/verilator.git
     ignore = dirty
+    branch = v5.026
 [submodule "synlig"]
     path = synlig
     url = https://github.com/chipsalliance/synlig.git
     ignore = dirty
+    branch = master
 [submodule "tt-support-tools"]
     path = tt-support-tools
     url = https://github.com/TinyTapeout/tt-support-tools.git
     ignore = dirty
-    branch = tt07
+    branch = tt08
 [submodule "tt07-dll"]
     path = tt07-dll
     url = https://github.com/dpetrisko/tt07-dll.git
@@ -33,24 +36,30 @@
     path = bsg_sv2v
     url = https://github.com/bespoke-silicon-group/bsg_sv2v
     ignore = dirty
+    branch = master
 [submodule "yosys"]
     path = yosys
     url = https://github.com/YosysHQ/yosys.git
     ignore = dirty
+    branch = yosys-0.43
 [submodule "OpenSTA"]
     path = OpenSTA
     url = https://github.com/The-OpenROAD-Project/OpenSTA.git
     ignore = dirty
+    branch = master
 [submodule "OpenROAD"]
     path = OpenROAD
     url = https://github.com/The-OpenROAD-Project/OpenROAD.git
     ignore = dirty
+    branch = master
 [submodule "OpenRAM"]
     path = OpenRAM
     url = https://github.com/VLSIDA/OpenRAM.git
     ignore = dirty
+    branch = v1.2.48
 [submodule "yosys-slang"]
     path = yosys-slang
     url = https://github.com/povik/yosys-slang.git
     ignore = dirty
+    branch = master
 

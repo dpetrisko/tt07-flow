@@ -153,7 +153,7 @@ $(synlig_tag): | $(venv_tag)
 
 $(yosys_tag): | $(venv_tag)
 	$(MAKE) _check_venv
-	cd $(YOSYS_ROOT) && git apply $(PATCH_ROOT)/yosys/*
+	$(MAKE) -C $(YOSYS_ROOT) config-gcc
 	$(MAKE) -C $(YOSYS_ROOT) PREFIX=$(VENV_ROOT)
 	$(MAKE) -C $(YOSYS_ROOT) install PREFIX=$(VENV_ROOT)
 	touch $@

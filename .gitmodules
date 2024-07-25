@@ -63,3 +63,9 @@
     ignore = dirty
     branch = master
 
+[submodule "basejump_stl"]
+	path = basejump_stl
+	url = https://github.com/bespoke-silicon-group/basejump_stl
+[submodule "bsg_manycore"]
+	path = bsg_manycore
+	url = https://github.com/bespoke-silicon-group/bsg_manycore
